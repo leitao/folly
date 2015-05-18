@@ -280,6 +280,13 @@ struct Baton : boost::noncopyable {
       // its other hyperthreads for a dozen cycles or so
       asm volatile ("pause");
 #endif
+#if FOLLY_PPC64LE
+      // We would like to pause and tell the CPU that we are spinning. There
+      // seems to be some alternatives, as for example 'or 31, 31, 31" but
+      // using this memory barrier seems more appropriate. The same mechanism
+      // is being used by mysql.
+      asm volatile("":::"memory");
+#endif
     }
 
     return false;
